@@ -55,7 +55,7 @@ UnifiedEmail/
 
 ![작성](Screenshots/Compose.png)
 
-### 메일 본문 및 채밀
+### 메일 본문
 
 ![상세](Screenshots/Detail.png)
 
