@@ -53,7 +53,7 @@ UnifiedEmail/
 
 ### 메일 작성
 
-![작성](Screenshots/compose.png)
+![작성](Screenshots/Compose.png)
 
 ### 메일 본문 및 채밀
 
