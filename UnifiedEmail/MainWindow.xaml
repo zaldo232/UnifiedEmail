@@ -1,0 +1,21 @@
+﻿<Window x:Class="UnifiedEmail.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:UnifiedEmail.Views"
+        Title="UnifiedEmail" Height="600" Width="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 상단 툴바 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10">
+            <Button Content="계정 관리 열기" Click="OpenAccountManager_Click" />
+            <Button Content="메일 쓰기" Click="ComposeEmail_Click" />
+        </StackPanel>
+
+        <!-- 기본 메일 리스트 또는 본문 뷰 -->
+        <views:EmailListView x:Name="MainEmailListView" Grid.Row="1" />
+    </Grid>
+</Window>

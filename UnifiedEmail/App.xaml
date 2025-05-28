@@ -1,0 +1,11 @@
+﻿<Application x:Class="UnifiedEmail.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:UnifiedEmail.Helpers"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <helpers:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <helpers:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </Application.Resources>
+</Application>

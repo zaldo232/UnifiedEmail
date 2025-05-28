@@ -1,0 +1,109 @@
+﻿<UserControl x:Class="UnifiedEmail.Views.EmailListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:UnifiedEmail.ViewModels"
+             xmlns:local="clr-namespace:UnifiedEmail.Views"
+             Unloaded="UserControl_Unloaded">
+
+    <UserControl.DataContext>
+        <vm:EmailListViewModel />
+    </UserControl.DataContext>
+
+    <StackPanel Margin="10">
+        <!-- 계정 선택 -->
+        <ComboBox ItemsSource="{Binding Accounts}" 
+                  SelectedItem="{Binding SelectedAccount}" 
+                  DisplayMemberPath="Email" />
+
+        <!-- 메일 가져오기 버튼 -->
+        <Button Content="메일 가져오기"
+                Command="{Binding FetchEmailsCommand}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                Margin="0,10,0,5" />
+
+        <!-- 메일 함 -->
+        <ComboBox ItemsSource="{Binding AvailableFolders}"
+                  SelectedItem="{Binding SelectedLogicalFolder, Mode=TwoWay}"
+                  Margin="0,10,0,10" />
+
+        <!-- 가져오는 중 표시 -->
+        <TextBlock Margin="0,0,0,10"
+                   Foreground="Gray"
+                   FontStyle="Italic"
+                   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="처리 중..." />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FetchEmailsCommand.IsRunning}" Value="True">
+                            <Setter Property="Text" Value="가져오는 중..." />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding DeleteEmailCommand.IsRunning}" Value="True">
+                            <Setter Property="Text" Value="삭제 중..." />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!-- 검색창 -->
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Text="제목 또는 발신자 검색" FontWeight="Bold"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <!-- 안읽은 갯수 -->
+        <TextBlock FontSize="14"
+           FontWeight="Bold"
+           Margin="0,0,0,10"
+           Text="{Binding UnreadCount, StringFormat=읽지 않은 메일 수: {0}개}" />
+        
+        <!-- 메일 리스트 -->
+        <ListView x:Name="EmailList"
+                  ItemsSource="{Binding FilteredMessages}"
+                  MouseDoubleClick="EmailList_MouseDoubleClick"
+                  Height="400">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" Width="300" />
+
+                    <!-- 읽음 여부 시각화 포함된 Subject 컬럼 -->
+                    <GridViewColumn Header="Subject" Width="400">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Subject}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="Black"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRead}" Value="True">
+                                                    <Setter Property="FontWeight" Value="Normal"/>
+                                                    <Setter Property="Foreground" Value="Gray"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="150" />
+
+                    <!-- 삭제 버튼 열 -->
+                    <GridViewColumn Header="" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="삭제"
+                                        Command="{Binding DataContext.DeleteEmailCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                        CommandParameter="{Binding}" 
+                                        Padding="4,0" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </StackPanel>
+</UserControl>

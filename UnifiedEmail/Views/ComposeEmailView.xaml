@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="UnifiedEmail.Views.ComposeEmailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:UnifiedEmail.ViewModels"
+             xmlns:local="clr-namespace:UnifiedEmail.Helpers">
+
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 입력 필드 -->
+        <StackPanel>
+            <TextBlock Text="수신자 이메일" />
+            <TextBox Text="{Binding ToEmail, Mode=TwoWay}" Margin="0,0,0,5"/>
+
+            <TextBlock Text="제목" />
+            <TextBox Text="{Binding Subject, Mode=TwoWay}" Margin="0,0,0,5"/>
+
+            <Button Content="첨부파일 추가" Command="{Binding AddAttachmentCommand}" Margin="0,0,0,5"/>
+
+            <ItemsControl ItemsSource="{Binding Attachments}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontSize="12"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- 본문 -->
+        <TextBox Grid.Row="1"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 Text="{Binding Body, Mode=TwoWay}" />
+
+        <!-- 전송 버튼 + 로딩 표시 -->
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Text="전송 중..."
+                           Visibility="{Binding IsSending, Converter={StaticResource BoolToVisibilityConverter}}"
+                           Foreground="DarkGray"
+                           FontStyle="Italic"
+                           Margin="0,0,10,0"/>
+
+                <Button Content="전송"
+                        Command="{Binding SendCommand}"
+                        IsEnabled="{Binding IsSending, Converter={StaticResource InverseBoolConverter}}"
+                        Width="80" Height="30"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
