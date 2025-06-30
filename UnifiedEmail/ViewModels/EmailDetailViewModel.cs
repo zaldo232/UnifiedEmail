@@ -4,16 +4,17 @@ using UnifiedEmail.Models;
 
 namespace UnifiedEmail.ViewModels
 {
+    // 이메일 상세보기 뷰모델
     public partial class EmailDetailViewModel : ObservableObject
     {
-        [ObservableProperty] private string subject;
-        [ObservableProperty] private string from;
-        [ObservableProperty] private string date;
-        [ObservableProperty] private string body;
+        [ObservableProperty] private string subject; // 제목
+        [ObservableProperty] private string from;    // 발신자
+        [ObservableProperty] private string date;    // 날짜/시간
+        [ObservableProperty] private string body;    // 본문
 
-        public List<MimePart> Attachments { get; } = new();
-        public MimeMessage OriginalMessage { get; }
-        public EmailAccountModel ReplyAccount { get; }
+        public List<MimePart> Attachments { get; } = new();      // 첨부파일 목록
+        public MimeMessage OriginalMessage { get; }              // 원본 메시지
+        public EmailAccountModel ReplyAccount { get; }           // 답장 계정 정보
 
         public EmailDetailViewModel(MimeMessage message, EmailAccountModel account)
         {
@@ -29,7 +30,9 @@ namespace UnifiedEmail.ViewModels
             foreach (var part in message.Attachments)
             {
                 if (part is MimePart mimePart)
-                    Attachments.Add(mimePart);
+                { 
+                    Attachments.Add(mimePart); 
+                }
             }
         }
     }

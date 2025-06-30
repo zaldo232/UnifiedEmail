@@ -1,35 +1,34 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using UnifiedEmail.Models;
 using UnifiedEmail.Services;
 
 namespace UnifiedEmail.ViewModels
 {
+    // 메일 작성/전송 뷰모델
     public partial class ComposeEmailViewModel : ObservableObject
     {
-        private readonly EmailService _emailService = new();
-        private readonly EmailAccountModel _account;
+        private readonly EmailService _emailService = new(); // 메일 전송 서비스
+        private readonly EmailAccountModel _account;         // 사용 계정
 
         public ComposeEmailViewModel(EmailAccountModel account)
         {
             _account = account;
         }
 
-        [ObservableProperty] private string toEmail;
-        [ObservableProperty] private string subject;
-        [ObservableProperty] private string body;
-        [ObservableProperty] private bool isSending;
+        [ObservableProperty] private string toEmail; // 수신자 이메일
+        [ObservableProperty] private string subject; // 제목
+        [ObservableProperty] private string body;    // 본문
+        [ObservableProperty] private bool isSending; // 전송 중 여부
 
-        public ObservableCollection<string> Attachments { get; } = new();
+        public ObservableCollection<string> Attachments { get; } = new(); // 첨부파일 목록
 
         public Action? CloseAction { get; set; } // 창 닫기 콜백
 
+        // 첨부파일 추가
         [RelayCommand]
         private void AddAttachment()
         {
@@ -46,6 +45,7 @@ namespace UnifiedEmail.ViewModels
             }
         }
 
+        // 메일 전송
         [RelayCommand]
         private async Task SendAsync()
         {

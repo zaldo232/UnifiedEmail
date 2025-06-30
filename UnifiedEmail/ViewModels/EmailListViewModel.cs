@@ -1,66 +1,65 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using MimeKit;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Security;
-using System;
-using System.Collections.Generic;
+using MimeKit;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using UnifiedEmail.Messages;
 using UnifiedEmail.Models;
 using UnifiedEmail.Services;
-using UnifiedEmail.Messages;
 
 namespace UnifiedEmail.ViewModels
 {
+    // 메일 목록/조회/삭제/읽음/검색/자동새로고침 뷰모델
     public partial class EmailListViewModel : ObservableObject, IRecipient<RefreshEmailListMessage>
     {
-        private readonly EmailService _emailService = new();
-        private readonly System.Timers.Timer _refreshTimer;
+        private readonly EmailService _emailService = new();                // 메일 서비스
+        private readonly System.Timers.Timer _refreshTimer;                 // 자동 새로고침 타이머
 
-        public ObservableCollection<EmailAccountModel> Accounts { get; } = new();
-        public ObservableCollection<EmailMessageModel> Messages { get; } = new();
-        public ObservableCollection<EmailMessageModel> FilteredMessages { get; } = new();
+        public ObservableCollection<EmailAccountModel> Accounts { get; } = new();              // 계정 목록
+        public ObservableCollection<EmailMessageModel> Messages { get; } = new();              // 전체 메일
+        public ObservableCollection<EmailMessageModel> FilteredMessages { get; } = new();      // 검색 필터링 결과
 
-        private static readonly List<string> LogicalFolderMaster = new()
+        private static readonly List<string> LogicalFolderMaster = new()    // 논리 폴더명
         {
             "받은메일함", "보낸메일함", "내게쓴메일"
         };
 
-        public ObservableCollection<string> AvailableFolders { get; } = new();
+        public ObservableCollection<string> AvailableFolders { get; } = new(); // UI에서 선택 가능한 폴더
 
-        private List<(UniqueId Uid, MimeMessage Message, MessageFlags Flags)> _rawMimeMessages = new();
+        private List<(UniqueId Uid, MimeMessage Message, MessageFlags Flags)> _rawMimeMessages = new(); // 원본 메일 캐시
 
-        [ObservableProperty] private EmailAccountModel selectedAccount;
-        [ObservableProperty] private string searchText;
-        [ObservableProperty] private bool isLoading;
-        [ObservableProperty] private string selectedLogicalFolder = "받은메일함";
+        [ObservableProperty] private EmailAccountModel selectedAccount;      // 선택 계정
+        [ObservableProperty] private string searchText;                     // 검색어
+        [ObservableProperty] private bool isLoading;                        // 로딩 중 여부
+        [ObservableProperty] private string selectedLogicalFolder = "받은메일함"; // 선택 논리폴더
 
-        public int UnreadCount => Messages.Count(m => !m.IsRead);
-        public int FilteredUnreadCount => FilteredMessages.Count(m => !m.IsRead);
+        public int UnreadCount => Messages.Count(m => !m.IsRead);           // 전체 안읽은 메일
+        public int FilteredUnreadCount => FilteredMessages.Count(m => !m.IsRead); // 검색결과 안읽은 메일
 
         public EmailListViewModel()
         {
-            LoadAccounts();
+            LoadAccounts(); // 계정 목록 로드
 
-            _refreshTimer = new System.Timers.Timer(60000);
+            _refreshTimer = new System.Timers.Timer(60000); // 60초 주기
             _refreshTimer.Elapsed += RefreshTimer_Elapsed;
             _refreshTimer.AutoReset = true;
             _refreshTimer.Start();
 
-            WeakReferenceMessenger.Default.Register<RefreshEmailListMessage>(this);
+            WeakReferenceMessenger.Default.Register<RefreshEmailListMessage>(this); // 메시지 구독
         }
 
+        // 메시지 수신(계정 새로고침)
         public void Receive(RefreshEmailListMessage message)
         {
             ReloadAccounts();
         }
 
+        // 타이머: 자동 새로고침
         private void RefreshTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(async () =>
@@ -69,15 +68,19 @@ namespace UnifiedEmail.ViewModels
             });
         }
 
+        // 계정 목록 로드
         private void LoadAccounts()
         {
             Accounts.Clear();
             var db = new DatabaseService();
             var list = db.GetAllAccounts();
             foreach (var acc in list)
-                Accounts.Add(acc);
+            { 
+                Accounts.Add(acc); 
+            }
         }
 
+        // 계정 선택 변경 시 폴더 목록 갱신
         partial void OnSelectedAccountChanged(EmailAccountModel? account)
         {
             AvailableFolders.Clear();
@@ -98,6 +101,7 @@ namespace UnifiedEmail.ViewModels
             SelectedLogicalFolder = AvailableFolders.FirstOrDefault() ?? "받은메일함";
         }
 
+        // 메일 목록 가져오기
         [RelayCommand]
         public async Task FetchEmailsAsync()
         {
@@ -116,6 +120,7 @@ namespace UnifiedEmail.ViewModels
 
                 string folderName = "INBOX";
 
+                // 논리폴더 → 실제 IMAP 폴더명 변환
                 if (ImapFolderMap.TryGetValue(provider, out var folderDict)
                     && folderDict.TryGetValue(logical, out var resolved))
                 {
@@ -158,6 +163,7 @@ namespace UnifiedEmail.ViewModels
             }
         }
 
+        // 메일 삭제
         [RelayCommand]
         public async Task DeleteEmailAsync(EmailMessageModel? selected)
         {
@@ -184,6 +190,7 @@ namespace UnifiedEmail.ViewModels
             }
         }
 
+        // 읽음 처리(플래그 추가)
         public async Task MarkAsReadAsync(EmailMessageModel email)
         {
             if (SelectedAccount == null || email.IsRead)
@@ -215,7 +222,7 @@ namespace UnifiedEmail.ViewModels
 
                 await folder.AddFlagsAsync(email.UniqueId, MessageFlags.Seen, true);
 
-                // 이 줄만 있으면 ObservableObject가 UI에 자동 반영해줌
+                // UI에 읽음 표시 적용
                 email.Flags |= MessageFlags.Seen;
 
                 OnPropertyChanged(nameof(UnreadCount));
@@ -227,6 +234,7 @@ namespace UnifiedEmail.ViewModels
             }
         }
 
+        // index로 원본 메시지 가져오기
         public Task<MimeMessage?> GetRawMessageByIndex(int index)
         {
             if (index >= 0 && index < _rawMimeMessages.Count)
@@ -235,12 +243,14 @@ namespace UnifiedEmail.ViewModels
             return Task.FromResult<MimeMessage?>(null);
         }
 
+        // 검색어 변경 시 필터 적용
         partial void OnSearchTextChanged(string value)
         {
             ApplyFilter();
             OnPropertyChanged(nameof(FilteredUnreadCount));
         }
 
+        // 메시지 필터링
         private void ApplyFilter()
         {
             FilteredMessages.Clear();
@@ -253,12 +263,14 @@ namespace UnifiedEmail.ViewModels
             }
         }
 
+        // 타이머 종료(앱종료 등)
         public void StopAutoRefresh()
         {
             _refreshTimer?.Stop();
             _refreshTimer?.Dispose();
         }
 
+        // 계정 새로고침(메시지 수신 등)
         public void ReloadAccounts()
         {
             Accounts.Clear();
@@ -268,6 +280,7 @@ namespace UnifiedEmail.ViewModels
                 Accounts.Add(acc);
         }
 
+        // 논리폴더 <-> IMAP 폴더 맵
         private static readonly Dictionary<string, Dictionary<string, string>> ImapFolderMap = new()
         {
             ["Gmail"] = new()

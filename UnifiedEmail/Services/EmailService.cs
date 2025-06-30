@@ -7,9 +7,10 @@ using UnifiedEmail.Models;
 
 namespace UnifiedEmail.Services
 {
+    // 메일 송수신/삭제 등 IMAP/SMTP 서비스
     public class EmailService
     {
-        // 메일 수신 (기본 Inbox)
+        // 메일 수신 (Inbox, 최대 30개)
         public async Task<List<(UniqueId Uid, MimeMessage Message, MessageFlags Flags)>> FetchInboxAsync(EmailAccountModel account)
         {
             var result = new List<(UniqueId, MimeMessage, MessageFlags)>();
@@ -17,28 +18,28 @@ namespace UnifiedEmail.Services
 
             try
             {
-                var decryptedPassword = EncryptionService.Decrypt(account.PasswordEncrypted);
-                await client.ConnectAsync(account.ImapServer, account.ImapPort,
-                    account.UseSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(account.Email, decryptedPassword);
+                var decryptedPassword = EncryptionService.Decrypt(account.PasswordEncrypted); // 비밀번호 복호화
+                await client.ConnectAsync(account.ImapServer, account.ImapPort, account.UseSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls); // IMAP 접속
+                await client.AuthenticateAsync(account.Email, decryptedPassword); // 인증
 
                 var inbox = client.Inbox;
                 await inbox.OpenAsync(FolderAccess.ReadOnly);
 
-                int fetchCount = Math.Min(30, inbox.Count);
+                int fetchCount = Math.Min(30, inbox.Count); // 최대 30개 제한
                 if (fetchCount == 0)
                 {
                     await client.DisconnectAsync(true);
                     return result;
                 }
 
+                // 최근 fetchCount개 메일 요약 조회
                 var summaries = inbox.Fetch(
                     inbox.Count - fetchCount,
                     -1,
                     MessageSummaryItems.UniqueId | MessageSummaryItems.Flags
                 );
 
-                foreach (var summary in summaries)
+                foreach (var summary in summaries) // 각 메일 상세 가져오기
                 {
                     var uid = summary.UniqueId;
                     var flags = summary.Flags ?? MessageFlags.None;
@@ -46,11 +47,11 @@ namespace UnifiedEmail.Services
                     result.Add((uid, message, flags));
                 }
 
-                await client.DisconnectAsync(true);
+                await client.DisconnectAsync(true); // 연결 종료
             }
             catch
             {
-                throw;
+                throw; // 예외 재전파
             }
 
             return result;
@@ -66,14 +67,17 @@ namespace UnifiedEmail.Services
 
             var builder = new BodyBuilder { HtmlBody = body };
 
-            foreach (var file in attachments)
-                builder.Attachments.Add(file);
+            foreach (var file in attachments) // 첨부파일 추가
+            { 
+                builder.Attachments.Add(file); 
+            }
 
             message.Body = builder.ToMessageBody();
 
             using var client = new SmtpClient();
             var password = EncryptionService.Decrypt(account.PasswordEncrypted);
 
+            // 포트별 보안옵션 자동 선택
             var socketOption = account.SmtpPort switch
             {
                 465 => SecureSocketOptions.SslOnConnect,
@@ -81,13 +85,13 @@ namespace UnifiedEmail.Services
                 _ => SecureSocketOptions.Auto
             };
 
-            await client.ConnectAsync(account.SmtpServer, account.SmtpPort, socketOption);
-            await client.AuthenticateAsync(account.Email, password);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            await client.ConnectAsync(account.SmtpServer, account.SmtpPort, socketOption); // SMTP 접속
+            await client.AuthenticateAsync(account.Email, password); // 인증
+            await client.SendAsync(message); // 메일 전송
+            await client.DisconnectAsync(true); // 연결 종료
         }
 
-        // 메일 삭제
+        // 메일 삭제 (특정 UID)
         public async Task DeleteEmailAsync(EmailAccountModel account, UniqueId uid)
         {
             using var client = new ImapClient();
@@ -99,13 +103,13 @@ namespace UnifiedEmail.Services
             var inbox = client.Inbox;
             await inbox.OpenAsync(FolderAccess.ReadWrite);
 
-            await inbox.AddFlagsAsync(uid, MessageFlags.Deleted, true);
-            await inbox.ExpungeAsync();
+            await inbox.AddFlagsAsync(uid, MessageFlags.Deleted, true); // 삭제 플래그 추가
+            await inbox.ExpungeAsync(); // 실제 삭제
 
             await client.DisconnectAsync(true);
         }
 
-        // 폴더 지정 후 메일 수신
+        // 폴더명 지정 후 메일 수신 (최대 30개)
         public async Task<List<(UniqueId, MimeMessage, MessageFlags)>> FetchFromFolderAsync(EmailAccountModel account, string folderName)
         {
             var result = new List<(UniqueId, MimeMessage, MessageFlags)>();
@@ -124,9 +128,10 @@ namespace UnifiedEmail.Services
 
             try
             {
-                var folder = await client.GetFolderAsync(folderName);
+                var folder = await client.GetFolderAsync(folderName); // 폴더 열기
                 await folder.OpenAsync(FolderAccess.ReadOnly);
 
+                // 최근 30개 요약 가져오기
                 var summaries = folder.Fetch(
                     Math.Max(0, folder.Count - 30),
                     -1,
@@ -150,7 +155,7 @@ namespace UnifiedEmail.Services
                 throw new Exception("메일 불러오기 중 오류 발생: " + ex.Message, ex);
             }
             finally
-            {   
+            {
                 await client.DisconnectAsync(true);
             }
 
