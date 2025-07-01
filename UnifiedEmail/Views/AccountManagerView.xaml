@@ -11,14 +11,15 @@
     <UserControl.DataContext>
         <vm:AccountViewModel />
     </UserControl.DataContext>
-
+    
+    <!-- 계정 관리 전체 레이아웃 영역 -->
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 계정 입력 -->
+        <!-- 계정 입력 영역 -->
         <StackPanel Orientation="Vertical" Margin="0,0,0,10">
             <TextBlock Text="메일 제공자 선택" />
             <ComboBox ItemsSource="{Binding Providers}"
@@ -41,8 +42,9 @@
                         IsEnabled="{Binding SelectedAccount, Converter={StaticResource NullToBoolConverter}}" />
             </StackPanel>
         </StackPanel>
+        <!-- 계정 입력 영역 끝 -->
 
-        <!-- 계정 리스트 -->
+        <!-- 계정 리스트 영역 -->
         <ListView Grid.Row="1" ItemsSource="{Binding Accounts}"
                   SelectedItem="{Binding SelectedAccount}">
             <ListView.View>
@@ -52,5 +54,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <!-- 계정 리스트 영역 끝 -->
     </Grid>
+    <!-- 계정 관리 전체 레이아웃 영역 끝 -->
 </UserControl>

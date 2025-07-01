@@ -9,24 +9,25 @@
         <vm:EmailListViewModel />
     </UserControl.DataContext>
 
+    <!-- 메일 목록 메인 영역 -->
     <StackPanel Margin="10">
-        <!-- 계정 선택 -->
+        <!-- 계정 선택 영역 -->
         <ComboBox ItemsSource="{Binding Accounts}" 
                   SelectedItem="{Binding SelectedAccount}" 
                   DisplayMemberPath="Email" />
 
-        <!-- 메일 가져오기 버튼 -->
+        <!-- 메일 가져오기 버튼 영역 -->
         <Button Content="메일 가져오기"
                 Command="{Binding FetchEmailsCommand}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                 Margin="0,10,0,5" />
 
-        <!-- 메일 함 -->
+        <!-- 메일함(폴더) 선택 영역 -->
         <ComboBox ItemsSource="{Binding AvailableFolders}"
                   SelectedItem="{Binding SelectedLogicalFolder, Mode=TwoWay}"
                   Margin="0,10,0,10" />
-
-        <!-- 가져오는 중 표시 -->
+            
+        <!-- 가져오는 중/삭제 중 표시 영역 -->
         <TextBlock Margin="0,0,0,10"
                    Foreground="Gray"
                    FontStyle="Italic"
@@ -46,19 +47,19 @@
             </TextBlock.Style>
         </TextBlock>
 
-        <!-- 검색창 -->
+        <!-- 검색창 영역 -->
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="제목 또는 발신자 검색" FontWeight="Bold"/>
             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
-        <!-- 안읽은 갯수 -->
+        <!-- 안읽은 갯수 표시 영역 -->
         <TextBlock FontSize="14"
            FontWeight="Bold"
            Margin="0,0,0,10"
            Text="{Binding UnreadCount, StringFormat=읽지 않은 메일 수: {0}개}" />
-        
-        <!-- 메일 리스트 -->
+
+        <!-- 메일 리스트 영역 -->
         <ListView x:Name="EmailList"
                   ItemsSource="{Binding FilteredMessages}"
                   MouseDoubleClick="EmailList_MouseDoubleClick"
@@ -91,7 +92,7 @@
 
                     <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="150" />
 
-                    <!-- 삭제 버튼 열 -->
+                    <!-- 삭제 버튼 열 영역 -->
                     <GridViewColumn Header="" Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -105,5 +106,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <!-- 메일 리스트 영역 끝 -->
     </StackPanel>
+    <!-- 메일 목록 메인 영역 끝 -->
 </UserControl>

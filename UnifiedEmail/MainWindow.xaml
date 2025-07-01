@@ -3,19 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:UnifiedEmail.Views"
         Title="UnifiedEmail" Height="600" Width="1000">
+    <!-- 메인 레이아웃 영역 -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 상단 툴바 -->
+        <!-- 상단 툴바 영역 -->
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10">
             <Button Content="계정 관리 열기" Click="OpenAccountManager_Click" />
             <Button Content="메일 쓰기" Click="ComposeEmail_Click" />
         </StackPanel>
+        <!-- 상단 툴바 영역 끝 -->
 
-        <!-- 기본 메일 리스트 또는 본문 뷰 -->
+        <!-- 메일 리스트/본문 뷰 영역 -->
         <views:EmailListView x:Name="MainEmailListView" Grid.Row="1" />
+        <!-- 메일 리스트/본문 뷰 영역 끝 -->
     </Grid>
+    <!-- 메인 레이아웃 영역 끝 -->
 </Window>

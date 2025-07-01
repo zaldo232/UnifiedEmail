@@ -9,6 +9,7 @@
         <local:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
 
+    <!-- 메일 작성 메인 영역 -->
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,7 +17,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 입력 필드 -->
+        <!-- 입력 필드 영역 -->
         <StackPanel>
             <TextBlock Text="수신자 이메일" />
             <TextBox Text="{Binding ToEmail, Mode=TwoWay}" Margin="0,0,0,5"/>
@@ -34,15 +35,17 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
+        <!-- 입력 필드 영역 끝 -->
 
-        <!-- 본문 -->
+        <!-- 본문 입력 영역 -->
         <TextBox Grid.Row="1"
                  AcceptsReturn="True"
                  TextWrapping="Wrap"
                  VerticalScrollBarVisibility="Auto"
                  Text="{Binding Body, Mode=TwoWay}" />
+        <!-- 본문 입력 영역 끝 -->
 
-        <!-- 전송 버튼 + 로딩 표시 -->
+        <!-- 전송 버튼, 로딩 표시 영역 -->
         <Grid Grid.Row="2" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <TextBlock Text="전송 중..."
@@ -57,5 +60,7 @@
                         Width="80" Height="30"/>
             </StackPanel>
         </Grid>
+        <!-- 전송 버튼, 로딩 표시 영역 끝 -->
     </Grid>
+    <!-- 메일 작성 메인 영역 끝 -->
 </UserControl>

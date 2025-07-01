@@ -7,13 +7,16 @@ using UnifiedEmail.ViewModels;
 
 namespace UnifiedEmail.Views
 {
+    // 메일 목록 뷰
     public partial class EmailListView : UserControl
     {
+        // 생성자
         public EmailListView()
         {
             InitializeComponent();
         }
 
+        // 메일 더블클릭 시 상세보기 팝업
         private async void EmailList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (DataContext is not EmailListViewModel vm) return;
@@ -45,10 +48,13 @@ namespace UnifiedEmail.Views
             win.ShowDialog();
         }
 
+        // 언로드 시 자동 새로고침 중지
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is EmailListViewModel vm)
-                vm.StopAutoRefresh();
+            { 
+                vm.StopAutoRefresh(); 
+            }
         }
     }
 }

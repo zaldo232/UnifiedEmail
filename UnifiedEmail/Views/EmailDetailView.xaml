@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="UnifiedEmail.Views.EmailDetailView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 메일 상세보기 메인 영역 -->
     <Grid Margin="10">
         <StackPanel>
             <TextBlock Text="{Binding Subject}" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
@@ -8,8 +9,8 @@
             <TextBlock Text="{Binding Date}" Margin="0,0,0,10"/>
 
             <WebBrowser x:Name="Browser" Height="400" />
-            
-            <!-- 첨부파일 다운로드 리스트 -->
+
+            <!-- 첨부파일 다운로드 리스트 영역 -->
             <ItemsControl ItemsSource="{Binding Attachments}" Margin="0,10,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -24,6 +25,8 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <!-- 첨부파일 다운로드 리스트 영역 끝 -->
         </StackPanel>
     </Grid>
+    <!-- 메일 상세보기 메인 영역 끝 -->
 </UserControl>
