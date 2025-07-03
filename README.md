@@ -61,6 +61,7 @@ MVVM 구조, SQLite 내장 DB, 실시간 폴링
 ## 아키텍처
 
 ![아키텍쳐](Screenshots/EmailArchitecture.png)
+
 ### 전체 구조
 ```plaintext
 UnifiedEmail/
