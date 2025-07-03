@@ -1,78 +1,75 @@
 # UnifiedEmail
 
-여러 이메일 계정을 통합 관리할 수 있는 WPF MVVM 기반 이메일 클라이언트입니다. Gmail, Naver 등 다양한 메일 서비스를 지원하며, 메일 수신/발신/삭제/검색/채밀파일 기능까지 제공합니다.
+## 프로젝트 명
+- **UnifiedEmail**
+- WPF 데스크탑 이메일 클라이언트 (.NET 8, MVVM, SQLite)
+- 다중 이메일 계정/POP3/IMAP/SMTP 지원, AES 암호화 저장
 
 ---
 
-## 기술 스택
+## 프로젝트 소개
 
-* WPF (.NET 8)
-* MVVM 아키텍쳐 (CommunityToolkit.Mvvm)
-* MailKit / MimeKit (메일 송수신)
-* SQLite (이메일 계정 저장)
-* AES 대치키 암호화 (비밀번호 보안 저장)
+**여러 이메일 계정을 한 곳에서 통합 관리**할 수 있는 WPF 기반 이메일 클라이언트입니다.  
+POP3/IMAP/SMTP 프로토콜 지원, 메일 송수신/검색/관리, 계정 암호화 저장,  
+MVVM 구조, SQLite 내장 DB, 실시간 폴링
+
+- **클라이언트:** WPF MVVM, 실시간 메일 수신, 여러 계정 동시 관리, AES 암호화, UI/UX 최적화  
+- **로컬 DB:** SQLite(이메일 계정/설정/임시 데이터 암호화 저장)
+
+---
+
+## 요구사항 및 NuGet 라이브러리
+
+### 클라이언트
+- **운영체제:** Windows 10/11
+- **.NET:** .NET 8 이상
+- **IDE:** Visual Studio 2022 이상
+- **DB:** SQLite (내장, 이메일 계정/설정 관리)
+- **NuGet 패키지:**
+  - `CommunityToolkit.Mvvm` (MVVM)
+  - `MailKit`, `MimeKit` (POP3/IMAP/SMTP)
+  - `Microsoft.Data.Sqlite`
+  - `BouncyCastle` (AES 등 암호화)
+  - 기타 WPF/SQLite 연동 관련
 
 ---
 
 ## 주요 기능
 
-| 기능            | 설명                                         |
-| ------------- | ------------------------------------------ |
-| 계정 등록         | Gmail, Gsuite, Naver 등 다양한 메일 계정을 등록, 삭제 가능 |
-| 메일 수신         | IMAP을 통한 메일 수신 및 폴더별 분류 (받은메일함/보낸메일함 등)    |
-| 메일 발신         | SMTP를 통해 메일 작성 및 전송 가능                     |
-| 메일 삭제         | 받은 메일 목록에서 개별 메일 삭제 기능 지원                  |
-| 파일 다운로드     | 수신된 파일 확인 및 저장 가능                        |
-| 메일 검색         | 제목, 발신자 기준 키워드 검색 기능 지원                    |
-| 읽음 처리         | 더블클릭 시 읽음 처리 및 UI에서 시각적 변화(Bold → Normal)  |
-| 자동 새로고침       | 60초 주기로 메일 목록 자동 갱신                        |
-| MVVM 메시지 토스토스 | 계정 등록/삭제 후 ViewModel 간 메시지 기반 동기화 처리       |
+### 이메일 관리
+- **계정 추가/삭제**: Gmail, Naver, Daum 등 IMAP/POP3 SMTP 자동 셋팅 지원
+- **실시간 메일 수신/발신**: 폴링 기반, 새로운 메일 자동 표시
+- **메일 목록/상세**: 폴더별(받은편지함, 보낸편지함 등) 분류, 첨부파일 표시
+- **메일 작성/첨부**: 새 메일 작성, 첨부파일, 이미지, HTML 지원
+- **메일 검색/정렬/필터**: 키워드, 날짜, 발신자 등 다양한 조건
+- **다중 계정 동시 관리**: 계정별/전체 보기, 전환
+- **AES 암호화 저장**: 모든 계정 정보 AES 등으로 암호화 저장, 안전한 로컬 보안
 
 ---
 
-## 폴더 구조
+## 기술 스택
 
-```
+- **C#, .NET 8, WPF**
+- **MVVM (CommunityToolkit.Mvvm)**
+- **MailKit/MimeKit** (이메일 프로토콜/암호화)
+- **SQLite** (로컬 계정/설정 관리)
+- **BouncyCastle** (AES 암호화)
+- **ObservableCollection** (실시간 데이터 바인딩)
+
+---
+
+## 아키텍처
+
+![아키텍쳐](Screenshots/EmailArchitecture.png)
+### 전체 구조
+```plaintext
 UnifiedEmail/
-├── Models/              # EmailAccountModel, EmailMessageModel 등
-├── Services/            # EmailService, DatabaseService, EncryptionService
-├── ViewModels/          # EmailListViewModel, AccountViewModel 등
-├── Views/               # EmailListView.xaml, ComposeEmailView.xaml 등
-├── Messages/            # Messenger 메시지 객체 (예: RefreshEmailListMessage)
-├── Screenshots/         # README 이미지 포더
-└── UnifiedEmail.sln     # 솔링션 진입 파일
-```
-
----
-
-## 스크린샷
-
-### 계정 등록 화면
-
-![계정등록](Screenshots/AccountManage.png)
-
-### 메일 작성
-
-![작성](Screenshots/Compose.png)
-
-### 메일 본문
-
-![상세](Screenshots/Detail.png)
-
-### 전체 메일 목록
-
-![목록](Screenshots/EmailList.png)
-
-### 검색/필터 적용
-
-![검색](Screenshots/SearchFilter.png)
-
----
-
-## 주의사항
-
-* 메일 계정 비밀번호는 SQLite에 AES 방식으로 암호화되어 저장됩니다.
-* Gmail 사용 시 IMAP 허용 및 앱 비밀번호 발급이 필요할 수 있습니다.
-* Naver 사용 시 POP3/IMAP 사용 설정이 필요합니다.
-
----
+├─ Models/               # EmailAccountModel, EmailMessageModel 등 데이터 모델
+├─ Services/             # EmailService(POP3/IMAP/SMTP), DatabaseService, EncryptionService
+├─ Helpers/              # WPF 바인딩/유틸리티 컨버터 등
+├─ ViewModels/           # AccountViewModel, EmailListViewModel 등 MVVM 뷰모델
+├─ Views/                # XAML 화면 및 코드비하인드
+├─ Messages/             # MVVM 메시징(뷰모델간 통신)
+├─ Resources/            # (확장가능, 이미지/아이콘/스타일 등)
+├─ App.xaml(.cs)         # 앱 진입점/리소스
+└─ ...
