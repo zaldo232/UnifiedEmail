@@ -1,22 +1,36 @@
 # UnifiedEmail
 
-## 프로젝트 명
-- **UnifiedEmail**
+## 프로젝트 개요
+
+  **여러 이메일 계정을 한 곳에서 통합 관리**할 수 있는 WPF 기반 이메일 클라이언트입니다.  
 - WPF 데스크탑 이메일 클라이언트 (.NET 8, MVVM, SQLite)
 - 다중 이메일 계정/POP3/IMAP/SMTP 지원, AES 암호화 저장
-
----
-
-## 프로젝트 소개
-
-**여러 이메일 계정을 한 곳에서 통합 관리**할 수 있는 WPF 기반 이메일 클라이언트입니다.  
-POP3/IMAP/SMTP 프로토콜 지원, 메일 송수신/검색/관리, 계정 암호화 저장,  
-MVVM 구조, SQLite 내장 DB, 실시간 폴링
-
+- POP3/IMAP/SMTP 프로토콜 지원, 메일 송수신/검색/관리, 계정 암호화 저장,  
+- MVVM 구조, SQLite 내장 DB, 실시간 폴링
 - **클라이언트:** WPF MVVM, 실시간 메일 수신, 여러 계정 동시 관리, AES 암호화, UI/UX 최적화  
 - **로컬 DB:** SQLite(이메일 계정/설정/임시 데이터 암호화 저장)
 
 ---
+
+## 아키텍처
+
+![아키텍쳐](Screenshots/EmailArchitecture.png)
+
+### 전체 구조
+```plaintext
+UnifiedEmail/
+├─ Models/               # EmailAccountModel, EmailMessageModel 등 데이터 모델
+├─ Services/             # EmailService(POP3/IMAP/SMTP), DatabaseService, EncryptionService
+├─ Helpers/              # WPF 바인딩/유틸리티 컨버터 등
+├─ ViewModels/           # AccountViewModel, EmailListViewModel 등 MVVM 뷰모델
+├─ Views/                # XAML 화면 및 코드비하인드
+├─ Messages/             # MVVM 메시징(뷰모델간 통신)
+├─ Resources/            # (확장가능, 이미지/아이콘/스타일 등)
+├─ App.xaml(.cs)         # 앱 진입점/리소스
+└─ ...
+```
+
+------------------------------
 
 ## 요구사항 및 NuGet 라이브러리
 
@@ -58,19 +72,3 @@ MVVM 구조, SQLite 내장 DB, 실시간 폴링
 
 ---
 
-## 아키텍처
-
-![아키텍쳐](Screenshots/EmailArchitecture.png)
-
-### 전체 구조
-```plaintext
-UnifiedEmail/
-├─ Models/               # EmailAccountModel, EmailMessageModel 등 데이터 모델
-├─ Services/             # EmailService(POP3/IMAP/SMTP), DatabaseService, EncryptionService
-├─ Helpers/              # WPF 바인딩/유틸리티 컨버터 등
-├─ ViewModels/           # AccountViewModel, EmailListViewModel 등 MVVM 뷰모델
-├─ Views/                # XAML 화면 및 코드비하인드
-├─ Messages/             # MVVM 메시징(뷰모델간 통신)
-├─ Resources/            # (확장가능, 이미지/아이콘/스타일 등)
-├─ App.xaml(.cs)         # 앱 진입점/리소스
-└─ ...
